@@ -2,7 +2,6 @@ import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 const url = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
 
 let client;

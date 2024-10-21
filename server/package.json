@@ -5,7 +5,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "database-update": "node ./database/setupDatabase.js",
+    "database-create": "node ./database/setupDatabase.js --delete"
   },
   "keywords": [],
   "author": "",
