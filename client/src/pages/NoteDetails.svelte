@@ -2,34 +2,37 @@
     import { onMount, onDestroy } from "svelte";
     import { user } from "../stores/user";
     import io from "socket.io-client";
+    import throttle from "lodash.throttle";
 
     let userId = $user.user._id;
     let noteId;
     let socket;
     let note = { title: "", content: "" };
 
-    function handleInputChange(event) {
-        note[event.target.id] = event.target.value;
-        socket.emit("update-note", noteId, note);
-    }
-
     onMount(async () => {
         const url = new URL(window.location.href);
         noteId = url.pathname.split('/').pop();
+
         try {
             const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
                 method: "GET",
                 credentials: "include"
             });
+
             if (!response.ok) {
                 throw new Error("Failed to fetch note details");
             }
+            
             note = await response.json();
         } catch (error) {
             console.error("Failed to fetch note details:", error);
         }
 
-        socket = io("http://localhost:8080");
+        socket = io("http://localhost:8080", {
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 5
+        });
         socket.emit("register-user", userId);
         socket.emit("join-note", noteId)
 
@@ -39,10 +42,36 @@
     });
 
     onDestroy(() => {
-        if (socket) {
-            socket.disconnect();
-        }
+        socket?.disconnect();
     });
+
+    const saveToDatabase = throttle(async (noteData) => {
+        try {
+            const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(noteData)
+            });
+            
+            if (!response.ok) {
+                throw new Error("Failed to save note");
+            }
+            
+            lastSavedVersion = JSON.stringify(noteData);
+        } catch (error) {
+            console.error("Failed to save note:", error);
+        }
+    }, 1000);
+
+    function handleInputChange(event) {
+        note[event.target.id] = event.target.value;
+        socket.emit("update-note", noteId, note);
+
+        saveToDatabase(note);
+    }
 </script>
 
 <main>
