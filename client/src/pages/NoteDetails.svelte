@@ -3,11 +3,14 @@
     import { user } from "../stores/user";
     import io from "socket.io-client";
     import throttle from "lodash.throttle";
+    import isEqual from "fast-deep-equal";
+    import logOut from "../util/logOut"; 
 
     let userId = $user.user._id;
     let noteId;
     let socket;
     let note = { title: "", content: "" };
+    let lastSavedVersion = {}
 
     onMount(async () => {
         const url = new URL(window.location.href);
@@ -31,6 +34,7 @@
         socket = io("http://localhost:8080", {
             reconnection: true,
             reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
             reconnectionAttempts: 5
         });
         socket.emit("register-user", userId);
@@ -46,9 +50,14 @@
     });
 
     const saveToDatabase = throttle(async (noteData) => {
+        if (isEqual(noteData, lastSavedVersion)) {
+            return;
+        }
+
         try {
             const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
                 method: "PUT",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -60,7 +69,7 @@
                 throw new Error("Failed to save note");
             }
             
-            lastSavedVersion = JSON.stringify(noteData);
+            lastSavedVersion = { ...noteData };
         } catch (error) {
             console.error("Failed to save note:", error);
         }
@@ -75,6 +84,10 @@
 </script>
 
 <main>
+    <nav class="navbar">
+        <button class="logout-button" on:click={logOut}>Log Out</button>
+    </nav>
+
     <div class="paper">
         <input
             id="title"
@@ -90,7 +103,7 @@
             class="content"
             placeholder="Start typing your note here..."
             on:input={handleInputChange}
-        ></textarea>
+        />
     </div>
 </main>
 

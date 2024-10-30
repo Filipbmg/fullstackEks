@@ -44,4 +44,27 @@ router.get('/notes/:id', async (req, res) => {
     }
 });
 
+router.put('/notes/:id', async (req, res) => {
+    if (req.session.user) {
+        const objectId = new ObjectId(req.params.id);
+        try {
+            const db = await connect();
+            const result = await db.collection('notes').updateOne(
+                { _id: objectId },
+                { $set: req.body }
+            );
+
+            if (result.modifiedCount > 0) {
+                return res.status(200).send({ message: "Note updated"});
+            } else {
+                return res.status(404).send({ error: "Note not found"});
+            }
+        } catch (error) {
+            return res.status(500).send({ error: "Error updating note"});
+        }
+    } else {
+        return res.status(401).send({ error: "Unauthorized"});
+    }
+});
+
 export default router;
