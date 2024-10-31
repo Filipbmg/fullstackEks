@@ -1,6 +1,6 @@
 <script>
     import { navigate } from "svelte-routing";
-    import toast, { Toaster } from "svelte-french-toast";
+    import { toast, Toaster } from "svelte-french-toast";
     import checkSession from "../util/checkSession";
     import { onMount } from "svelte";
     
@@ -25,7 +25,7 @@
             throw new Error("Login Failed");
         }
         setTimeout(() => {
-            navigate("/Home");
+            navigate("/Home", { replace: true });
         }, 2000);
     }
 

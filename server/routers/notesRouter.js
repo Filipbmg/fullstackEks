@@ -47,24 +47,51 @@ router.get('/notes/:id', async (req, res) => {
 router.put('/notes/:id', async (req, res) => {
     if (req.session.user) {
         const objectId = new ObjectId(req.params.id);
+
         try {
             const db = await connect();
+
+            //Separate immutable field(_id) from rest of body. 
+            const { _id, ...updatedNote } = req.body; 
+
             const result = await db.collection('notes').updateOne(
                 { _id: objectId },
-                { $set: req.body }
+                { $set: updatedNote }
             );
 
             if (result.modifiedCount > 0) {
-                return res.status(200).send({ message: "Note updated"});
+                return res.status(200).send({ message: "Note updated" });
             } else {
-                return res.status(404).send({ error: "Note not found"});
+                return res.status(500).send({ error: "Note not updated, no changes detected." });
             }
         } catch (error) {
-            return res.status(500).send({ error: "Error updating note"});
+            console.error("Error updating note:", error);
+            return res.status(500).send({ error: "Error updating note" });
         }
     } else {
-        return res.status(401).send({ error: "Unauthorized"});
+        return res.status(401).send({ error: "Unauthorized" });
     }
 });
+
+router.post('/notes', async (req, res) => {
+    if (req.session.user) {
+        try {
+            const db = await connect();
+            const result = await db.collection("notes").insertOne({
+                ownerId: req.session.user.id,
+                title: "New note"
+            });
+            
+            res.status(201).send({
+                message: "Note created successfully",
+                _id: result.insertedId
+            });
+        } catch (error) {
+            res.status(500).send({ message: "Error creating note" });
+        }
+    } else {
+        res.status(401).send({ message: "Unauthorized: User must be logged in."});
+    }
+})
 
 export default router;

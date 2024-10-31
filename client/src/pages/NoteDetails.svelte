@@ -5,6 +5,7 @@
     import throttle from "lodash.throttle";
     import isEqual from "fast-deep-equal";
     import logOut from "../util/logOut"; 
+    import { navigate } from "svelte-routing";
 
     let userId = $user.user._id;
     let noteId;
@@ -58,9 +59,7 @@
             const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
                 method: "PUT",
                 credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify(noteData)
             });
@@ -85,9 +84,9 @@
 
 <main>
     <nav class="navbar">
+        <button class="home-button" on:click={() => navigate("/Home")}>Home</button>
         <button class="logout-button" on:click={logOut}>Log Out</button>
     </nav>
-
     <div class="paper">
         <input
             id="title"
@@ -101,7 +100,7 @@
             id="content"
             bind:value={note.content}
             class="content"
-            placeholder="Start typing your note here..."
+            placeholder="Start typing your notes here..."
             on:input={handleInputChange}
         />
     </div>
