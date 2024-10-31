@@ -3,7 +3,8 @@ import { user } from "../stores/user.js";
 export async function checkSession() {
     try {
         const response = await fetch("http://localhost:8080/users/session", {
-            credentials: "include",
+            method: "GET",
+            credentials: "include"
         });
         if (response.ok) {
             const userData = await response.json();

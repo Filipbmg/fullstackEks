@@ -22,32 +22,36 @@ async function setupDatabase() {
         
         //Seeding
         if (deleteMode) {
+            const dennisId = new ObjectId();
+            const bobId = new ObjectId();
+            const casperId = new ObjectId();
+
             const initialUsers = [
-                { _id: 1, email: "anton@example.com", password: "$2b$12$InKdQGST0S2KkDaPsRlVwOydq/XegV1IallrZrzJWKcP/GxaoY3/a" },
-                { _id: 2, email: "bob@example.com", password: "$2b$12$InKdQGST0S2KkDaPsRlVwOydq/XegV1IallrZrzJWKcP/GxaoY3/a" },
-                { _id: 3, email: "casper@example.com", password: "$2b$12$InKdQGST0S2KkDaPsRlVwOydq/XegV1IallrZrzJWKcP/GxaoY3/a" },
+                { _id: dennisId, email: "dennis@example.com", password: "$2b$12$InKdQGST0S2KkDaPsRlVwOydq/XegV1IallrZrzJWKcP/GxaoY3/a" },
+                { _id: bobId, email: "bob@example.com", password: "$2b$12$InKdQGST0S2KkDaPsRlVwOydq/XegV1IallrZrzJWKcP/GxaoY3/a" },
+                { _id: casperId, email: "casper@example.com", password: "$2b$12$InKdQGST0S2KkDaPsRlVwOydq/XegV1IallrZrzJWKcP/GxaoY3/a" },
             ];
             await usersCollection.insertMany(initialUsers);
 
             const initialNotes = [
                 {
                     _id: new ObjectId(),
-                    ownerId: 1,
+                    ownerId: dennisId,
                     collaborators: [
-                        { userId: 2, privilege: 'write' },
-                        { userId: 3, privilege: 'read' }
+                        { userId: bobId, email: "bob@example.com" },
+                        { userId: casperId, email: "casper@example.com" }
                     ],
                     title: "Math",
-                    content: "Anton's first note with collaborators.",
+                    content: "Dennis' first note with collaborators.",
                 },
                 {
                     _id: new ObjectId(),
-                    ownerId: 2,
+                    ownerId: bobId,
                     collaborators: [
-                        { userId: 1, privilege: 'read' }
+                        { userId: dennisId, email: "dennis@example.com" }
                     ],
                     title: "Biology",
-                    content: "Bob's biology notes shared with Anton."
+                    content: "Bob's biology notes shared with Dennis."
                 },
             ];
             await notesCollection.insertMany(initialNotes);

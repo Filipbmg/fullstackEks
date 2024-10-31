@@ -80,10 +80,20 @@
 
         saveToDatabase(note);
     }
+
+    async function addNewCollaborator() {
+        const response = await fetch(`http://localhost:8080/collaborators`, {
+
+        }
+
+        )}
 </script>
 
 <main>
     <nav class="navbar">
+        <h2>
+            NotePal
+        </h2>
         <button class="home-button" on:click={() => navigate("/Home")}>Home</button>
         <button class="logout-button" on:click={logOut}>Log Out</button>
     </nav>
@@ -107,6 +117,18 @@
 </main>
 
 <style>
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: lightgrey;
+      border-bottom: 2px solid black;
+      padding: 10px;
+      z-index: 1000;
+    }
+
+
     :global(body) {
         margin: 0;
         padding: 0;

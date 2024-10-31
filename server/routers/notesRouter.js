@@ -25,7 +25,7 @@ router.get('/notes', async (req, res) => {
 
 router.get('/notes/:id', async (req, res) => {
     if (req.session.user) {
-        const objectId = new ObjectId(req.params.id);
+        const objectId = ObjectId(req.params.id);
         try {
             const db = await connect();
             const note = await db.collection('notes').findOne({ _id: objectId });
@@ -46,7 +46,7 @@ router.get('/notes/:id', async (req, res) => {
 
 router.put('/notes/:id', async (req, res) => {
     if (req.session.user) {
-        const objectId = new ObjectId(req.params.id);
+        const objectId = ObjectId(req.params.id);
 
         try {
             const db = await connect();

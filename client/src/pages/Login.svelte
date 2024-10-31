@@ -77,7 +77,7 @@
 
     async function sendWelcomeMail() {
         const response = await fetch("http://localhost:8080/signupMail", {
-            method: "post",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, name }),
         });
@@ -102,34 +102,52 @@
 </script>
 
 <Toaster/>
+<main>
+    <nav class="navbar">
+        <h2>
+            NotePal
+        </h2>
+    </nav>
+    <div class="container">
+        {#if showLoginForm}
+            <form on:submit|preventDefault={handleLoginToast} class="form">
+                <label for="email">Email</label>
+                <input type="email" bind:value={email} id="email" required placeholder="Email"/>
+    
+                <label for="password">Password</label>
+                <input type="password" bind:value={password} id="password" required placeholder="Password"/>
+    
+                <button type="submit" class="submit-button">Log In</button>
+                <button class="toggle-button" on:click={toggle}>Sign Up</button>
+            </form>
+        {:else}
+            <form on:submit|preventDefault={handleSignUpToast} class="form">
+                <label for="email">Email</label>
+                <input type="email" bind:value={email} id="email" required placeholder="Email"/>
+    
+                <label for="password">Password</label>
+                <input type="password" bind:value={password} id="password" required placeholder="Password"/>
+    
+                <button type="submit" class="submit-button">Sign Up</button>
+                <button class="toggle-button" on:click={toggle}>Log In</button>
+            </form>
+        {/if}
+    </div>
+</main>
 
-<div class="container">
-    {#if showLoginForm}
-        <form on:submit|preventDefault={handleLoginToast} class="form">
-            <label for="email">Email</label>
-            <input type="email" bind:value={email} id="email" required placeholder="Email"/>
-
-            <label for="password">Password</label>
-            <input type="password" bind:value={password} id="password" required placeholder="Password"/>
-
-            <button type="submit" class="submit-button">Log In</button>
-            <button class="toggle-button" on:click={toggle}>Sign Up</button>
-        </form>
-    {:else}
-        <form on:submit|preventDefault={handleSignUpToast} class="form">
-            <label for="email">Email</label>
-            <input type="email" bind:value={email} id="email" required placeholder="Email"/>
-
-            <label for="password">Password</label>
-            <input type="password" bind:value={password} id="password" required placeholder="Password"/>
-
-            <button type="submit" class="submit-button">Sign Up</button>
-            <button class="toggle-button" on:click={toggle}>Log In</button>
-        </form>
-    {/if}
-</div>
 
 <style>
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: lightgrey;
+      border-bottom: 2px solid black;
+      padding: 10px;
+      z-index: 1000;
+    }
+
     .container {
         max-width: 365px;
         margin: auto;

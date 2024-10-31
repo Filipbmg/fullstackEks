@@ -49,6 +49,9 @@
 
 <main>
   <nav class="navbar">
+    <h2>
+      NotePal
+    </h2>
     <button class="logout-button" on:click={logOut}>Log Out</button>
   </nav>
   <h2>Your Notes</h2>
@@ -76,11 +79,27 @@
 </main>
 
 <style>
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: lightgrey;
+      border-bottom: 2px solid black;
+      padding: 10px;
+      z-index: 1000;
+    }
+
     .logout-button {
         background-color: red;
     }
+
     .logout-button:hover {
         background-color: darkred;
+    }
+
+    main {
+        padding-top: 60px; /* add padding to the main content to avoid overlap with the navbar */
     }
 </style>
   
