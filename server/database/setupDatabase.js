@@ -36,19 +36,19 @@ async function setupDatabase() {
             const initialNotes = [
                 {
                     _id: new ObjectId(),
-                    ownerId: dennisId,
+                    ownerId: dennisId.toString(),
                     collaborators: [
-                        { userId: bobId, email: "bob@example.com" },
-                        { userId: casperId, email: "casper@example.com" }
+                        { userId: bobId.toString(), email: "bob@example.com" },
+                        { userId: casperId.toString(), email: "casper@example.com" }
                     ],
                     title: "Math",
                     content: "Dennis' first note with collaborators.",
                 },
                 {
                     _id: new ObjectId(),
-                    ownerId: bobId,
+                    ownerId: bobId.toString(),
                     collaborators: [
-                        { userId: dennisId, email: "dennis@example.com" }
+                        { userId: dennisId.toString(), email: "dennis@example.com" }
                     ],
                     title: "Biology",
                     content: "Bob's biology notes shared with Dennis."

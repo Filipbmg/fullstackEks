@@ -20,7 +20,6 @@ router.post('/login', async (req, res) => {
                 id: userQuery._id,
                 email: userQuery.email,
             };
-            console.log("Session user set: ", req.session.user)
             res.send({ message: "Login success" });
         } else {
             res.status(401).send({ message: "Invalid credentials" });

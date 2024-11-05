@@ -7,12 +7,13 @@ const router = Router();
 router.get('/notes', async (req, res) => {
     if (req.session.user) {
         try {
+            const userId = req.session.user.id
             const db = await connect();
             const ownNotes = await db.collection("notes")
-                .find({ ownerId: req.session.user.id })
+                .find({ ownerId: userId })
                 .toArray(); 
             const collabNotes = await db.collection("notes")
-                .find({ "collaborators.userId": req.session.user.id })
+                .find({ "collaborators.userId": userId })
                 .toArray();    
             return res.send({ ownNotes, collabNotes });
         } catch (error) {
@@ -25,8 +26,8 @@ router.get('/notes', async (req, res) => {
 
 router.get('/notes/:id', async (req, res) => {
     if (req.session.user) {
-        const objectId = ObjectId(req.params.id);
         try {
+            const objectId = new ObjectId(req.params.id);
             const db = await connect();
             const note = await db.collection('notes').findOne({ _id: objectId });
 
@@ -46,9 +47,8 @@ router.get('/notes/:id', async (req, res) => {
 
 router.put('/notes/:id', async (req, res) => {
     if (req.session.user) {
-        const objectId = ObjectId(req.params.id);
-
         try {
+            const objectId = new ObjectId(req.params.id);
             const db = await connect();
 
             //Separate immutable field(_id) from rest of body. 
@@ -76,9 +76,11 @@ router.put('/notes/:id', async (req, res) => {
 router.post('/notes', async (req, res) => {
     if (req.session.user) {
         try {
+            const objectId = new ObjectId(req.session.user.id);
+            console.log(objectId)
             const db = await connect();
             const result = await db.collection("notes").insertOne({
-                ownerId: req.session.user.id,
+                ownerId: objectId,
                 title: "New note"
             });
             

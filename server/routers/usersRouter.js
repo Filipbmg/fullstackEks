@@ -5,7 +5,6 @@ import { ObjectId } from "mongodb";
 const router = Router();
 
 router.get('/users/session', async (req, res) => {
-    console.log("Current session: ", req.session); // Log the current session
     if (req.session.user) {
         const objectId = new ObjectId(req.session.user.id)
         try {

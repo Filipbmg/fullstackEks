@@ -19,8 +19,12 @@ router.post('/signup', async (req, res) => {
             else {
                 const hash = await bcrypt.hash(password, 12);
                 const result = await db.collection("users").insertOne({ email, password: hash });
-                res.send({ insertedId: result.insertedId });
-                console.log("User created");
+
+                if (result.insertedId) {
+                    return res.status(201).send({ message: 'User created successfully'});
+                } else {
+                    return res.status(500).send({ message: 'User creation failed'})
+                }
             }
         } catch (error) {
             console.error('Database error: ', error);

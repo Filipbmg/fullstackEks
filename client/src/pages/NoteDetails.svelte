@@ -10,7 +10,10 @@
     let userId = $user.user._id;
     let noteId;
     let socket;
+    let collaboratorEmail;
+    let collaboratorList = [];
     let note = { title: "", content: "" };
+    let showCollaboratorsMenu = false;
     let lastSavedVersion = {}
 
     onMount(async () => {
@@ -28,6 +31,7 @@
             }
             
             note = await response.json();
+            collaboratorList = note.collaborators || [];
         } catch (error) {
             console.error("Failed to fetch note details:", error);
         }
@@ -60,7 +64,6 @@
                 method: "PUT",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",
                 body: JSON.stringify(noteData)
             });
             
@@ -70,7 +73,7 @@
             
             lastSavedVersion = { ...noteData };
         } catch (error) {
-            console.error("Failed to save note:", error);
+            throw new Error("Failed to save note:", error.message);
         }
     }, 1000);
 
@@ -82,11 +85,35 @@
     }
 
     async function addNewCollaborator() {
-        const response = await fetch(`http://localhost:8080/collaborators`, {
-
+        if (!collaboratorEmail) {
+            return;
         }
+        try {
+            const response = await fetch(`http://localhost:8080/collaborators`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ noteId: noteId, email: collaboratorEmail })
+            });
+            
+            if (!response.ok) {
+                throw new Error("Failed to add collaborator");
+            }
 
-        )}
+            const updatedNoteResponse = await fetch(`http://localhost:8080/notes/${noteId}`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (updatedNoteResponse.ok) {
+                const updatedNote = await updatedNoteResponse.json();
+                collaboratorList = updatedNote.collaborators || [];
+                collaboratorEmail = ""; // Clear the input field
+            }
+        } catch (error) {
+            throw new Error("Failed to add collaborator: " + error.message);
+        }
+    }
 </script>
 
 <main>
@@ -94,7 +121,31 @@
         <h2>
             NotePal
         </h2>
-        <button class="home-button" on:click={() => navigate("/Home")}>Home</button>
+        <button class="nav-button" on:click={() => navigate("/Home")}>Home</button>
+        <div class="dropdown">
+            <button class="nav-button" 
+            on:click={() => showCollaboratorsMenu = !showCollaboratorsMenu}
+            aria-haspopup="true"
+            aria-expanded={showCollaboratorsMenu}
+            >Manage Collaborators</button>
+            {#if showCollaboratorsMenu}
+                <div class="dropdown-menu">
+                    <h3>Collaborators</h3>
+                        <ul>
+                            {#each collaboratorList as collaborator}
+                                <li>{collaborator.email}</li>
+                            {/each}
+                        </ul>
+                        <input
+                            type="email"
+                            bind:value={collaboratorEmail}
+                            placeholder="Add collaborator email"
+                        />
+                        <button on:click={addNewCollaborator}>Add Collaborator</button>
+                </div>
+            {/if}
+        </div>
+
         <button class="logout-button" on:click={logOut}>Log Out</button>
     </nav>
     <div class="paper">
@@ -126,6 +177,59 @@
       border-bottom: 2px solid black;
       padding: 10px;
       z-index: 1000;
+    }
+    
+    .nav-button {
+        padding: 8px;
+        margin-right: 10px;
+    }
+    
+    /* Dropdown container styling */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    
+    /* Dropdown menu styling */
+    .dropdown-menu {
+        display: block;
+        position: absolute;
+        top: 100%; /* Positions below the button */
+        left: 0;
+        margin-top: 5px;
+        padding: 15px;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 200px;
+        z-index: 10;
+    }
+
+    .dropdown-menu h3 {
+        margin-top: 0;
+    }
+    
+    /* Collaborator List Styling */
+    .collaborator-list ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 0 10px 0;
+    }
+    
+    .collaborator-list input {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+    }
+    
+    .collaborator-list button {
+        width: 100%;
+        padding: 8px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
     }
 
 
