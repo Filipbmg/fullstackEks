@@ -39,7 +39,6 @@
       }
 
       const newNote = await response.json();
-      console.log(newNote)
       navigate(`/notes/${newNote._id}`);
     } catch (error) {
       throw new Error("Failed to create note: " + error.message);
@@ -67,7 +66,7 @@
 
   async function leaveNote(noteId) {
     try {
-      const response = await fetch(`http://localhost:8080/collaborators/leave`, {
+      const response = await fetch(`http://localhost:8080/collaborators/self`, {
         method: "DELETE",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -99,12 +98,12 @@
       <h2>Your Notes</h2>
       <ul>
         {#each ownNotes as note}
-          <li>
-            <button on:click={() => navigate(`/notes/${note._id}`)}>
+          <li class="note-item">
+            <button class="note-button" on:click={() => navigate(`/notes/${note._id}`)}>
               { note.title || "Untitled Note" }
             </button>
             <button class="delete-button" on:click={() => deleteNote(note._id)}>
-              Delete
+              ✖
             </button>
           </li>
         {/each}
@@ -116,12 +115,12 @@
       <h2>Collaborator's Notes</h2>
       <ul>
         {#each collabNotes as note}
-          <li>
-            <button on:click={() => navigate(`/notes/${note._id}`)}>
+          <li class="note-item">
+            <button class="note-button" on:click={() => navigate(`/notes/${note._id}`)}>
               { note.title || "Untitled Note" }
             </button>
             <button class="leave-button" on:click={() => leaveNote(note._id)}>
-              Leave
+              ✖
             </button>
           </li>
         {/each}
@@ -138,7 +137,10 @@
     margin-bottom: 60px;
   }
 
-  .notes-container {
+  .notes-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
     border: 1px solid #ccc;
     padding: 15px;
     border-radius: 5px;
@@ -146,33 +148,45 @@
     min-width: 300px;
   }
 
-  .notes-container h2 {
-    margin-top: 0;
-    text-align: center;
-  }
-
-  .notes-container ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .notes-container li {
+  .note-item {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
   }
 
-  .notes-container li button {
-    width: 100%;
+  .note-button {
+    flex-grow: 1;
     padding: 10px;
     text-align: left;
-    background-color: #e0e0e0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .note-button:hover {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  .delete-button,
+  .leave-button {
+    margin-left: 8px;
+    padding: 2px 5px; /* Reduced padding for even spacing */
+    background-color: red;
+    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    flex-shrink: 0;
+    display: flex; /* Ensures icon is centered within the button */
+    align-items: center; /* Centers the icon vertically */
+    justify-content: center; /* Centers the icon horizontally */
   }
 
-  .notes-container li button:hover {
-    background-color: #d0d0d0;
+  .delete-button:hover,
+  .leave-button:hover {
+    background-color: darkred;
   }
 
   .create-note-button {

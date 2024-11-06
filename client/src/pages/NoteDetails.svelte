@@ -33,7 +33,7 @@
             note = await response.json();
             collaboratorList = note.collaborators || [];
         } catch (error) {
-            console.error("Failed to fetch note details:", error);
+            throw new Error("Failed to fetch note details:", error);
         }
 
         socket = io("http://localhost:8080", {
@@ -109,7 +109,6 @@
     }
 
     async function removeCollaborator(email) {
-        console.log("Removing collaborator with email:", email, "for noteId:", noteId);
         try {
             const response = await fetch(`http://localhost:8080/collaborators/remove`, {
                 method: "DELETE",
@@ -145,10 +144,14 @@
                 {#if showCollaboratorsMenu}
                     <div class="dropdown-menu">
                         <h3>Collaborators</h3>
-                            <ul>
+                            <ul class="collaborator-list">
                                 {#each collaboratorList as collaborator}
-                                    <li>{collaborator.email}</li>
-                                    <button on:click={() => removeCollaborator(collaborator.email)}>Remove</button>
+                                    <li class="collaborator-item">
+                                        <span>
+                                            {collaborator.email}
+                                        </span>
+                                        <button class="remove-button" on:click={() => removeCollaborator(collaborator.email)}>✖</button>
+                                    </li>
                                 {/each}
                             </ul>
                             <input
@@ -156,7 +159,7 @@
                                 bind:value={collaboratorEmail}
                                 placeholder="Add collaborator email"
                             />
-                            <button on:click={addNewCollaborator}>Add Collaborator</button>
+                            <button class="collaborator-button" on:click={addNewCollaborator}>Add Collaborator</button>
                     </div>
                 {/if}
             </div>
@@ -255,28 +258,55 @@
     .dropdown-menu h3 {
         margin-top: 0;
     }
-    
-    /* Collaborator List Styling */
-    .collaborator-list ul {
-        list-style-type: none;
+
+    .collaborator-list {
+        list-style: none;
         padding: 0;
-        margin: 0 0 10px 0;
+        margin: 0;
     }
-    
-    .collaborator-list input {
-        width: 100%;
-        padding: 5px;
-        margin-bottom: 10px;
+
+    .collaborator-item {
+        display: flex;
+        justify-content: space-between; /* Ensures spacing between email and button */
+        align-items: center; /* Vertically centers the elements */
+        margin-bottom: 10px; /* Adds some space between the items */
     }
-    
-    .collaborator-list button {
-        width: 100%;
-        padding: 8px;
-        background-color: #007bff;
-        color: #fff;
+
+    input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px; /* Adds space between the input and button */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+    }
+
+    input[type="email"]:focus {
+    border-color: #0056b3; /* Changes border color when focused */
+    outline: none;
+    }
+
+/* Style for the Add Collaborator button */
+    .collaborator-button {
+        width: 100%; /* Makes the button span the full width */
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
         border: none;
+        border-radius: 4px;
+        font-size: 16px;
         cursor: pointer;
+        transition: background-color 0.3s ease;
     }
+
+/* Button hover effect */
+    .collaborator-button:hover {
+        background-color: #45a049; /* Darker shade when hovered */
+    }
+
 
     .paper {
         width: 100%;
@@ -335,5 +365,19 @@
 
     .logout-button:hover {
       background-color: darkred;
+    }
+
+    .remove-button {
+        margin-left: 8px;
+        padding: 2px 5px; /* Reduced padding for even spacing */
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex; /* Ensures icon is centered within the button */
+        align-items: center; /* Centers the icon vertically */
+        justify-content: center; /* Centers the icon horizontally */
     }
 </style>

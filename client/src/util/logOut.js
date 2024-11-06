@@ -12,7 +12,7 @@ export async function logOut() {
       }
       navigate("/");
     } catch (err) {
-      console.error("Logout Error: " + err.message);
+      throw new Error("Logout Error: " + err.message);
     }
 }
 

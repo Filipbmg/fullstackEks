@@ -9,12 +9,10 @@ export async function checkSession() {
         if (response.ok) {
             const userData = await response.json();
             user.set(userData);
-            console.log(userData)
             return userData;
         }
         return null;
     } catch (error) {
-        console.error('Error verifying session: ', error);
         return null;
     }
 }

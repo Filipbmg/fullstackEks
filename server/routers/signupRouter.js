@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { connect } from '../database/connection.js';
+import { sanitizeEmail } from '../util/sanitize.js';
 
 const router = Router();
 
 router.post('/signup', async (req, res) => {
-    const { email, password} = req.body;
+    const email = sanitizeEmail(req.body.email);
+    const { password } = req.body;
     if ( !email || !password ) {
         return res.status(400).send({ error: 'Missing field(s)' });
     }

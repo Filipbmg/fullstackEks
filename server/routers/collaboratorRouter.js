@@ -30,11 +30,10 @@ router.put('/collaborators', async (req, res) => {
     }
 })
 
-router.delete('/collaborators/remove', async (req, res) => {
+router.delete('/collaborators/', async (req, res) => {
     if (req.session.user) {
         try {
             const { noteId, email } = req.body;
-            console.log("Received noteId:", noteId, "and email:", email);
             const objectId = new ObjectId(noteId);
             const db = await connect();
             const collaborator = await db.collection('users').findOne({ email })
@@ -57,7 +56,7 @@ router.delete('/collaborators/remove', async (req, res) => {
     }
 })
 
-router.delete('/collaborators/leave', async (req, res) => {
+router.delete('/collaborators/self', async (req, res) => {
     if (req.session.user) {
         try {
             const { noteId } = req.body;
