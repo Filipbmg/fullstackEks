@@ -30,7 +30,7 @@ router.put('/collaborators', async (req, res) => {
     }
 })
 
-router.delete('/collaborators', async (req, res) => {
+router.delete('/collaborators/remove', async (req, res) => {
     if (req.session.user) {
         try {
             const { noteId, email } = req.body;
@@ -45,6 +45,33 @@ router.delete('/collaborators', async (req, res) => {
                 const result = await db.collection('notes').updateOne(
                     {_id: objectId},
                     { $pull: { collaborators: { userId: collaborator._id.toString(), email: collaborator.email}}}
+                )
+            }
+
+            return res.status(204).send({ message: "Collaborator removed" });
+        } catch (error) {
+            return res.status(500).send({ error: "Error removing collaborator"});
+        }
+    } else {
+        return res.status(401).send({ error: "Unauthorized" });
+    }
+})
+
+router.delete('/collaborators/leave', async (req, res) => {
+    if (req.session.user) {
+        try {
+            const { noteId } = req.body;
+            const objectId = new ObjectId(noteId);
+            const db = await connect();
+            const userId = req.session.user.id;
+            const collaborator = await db.collection('users').findOne({ userId })
+
+            if (!collaborator) {
+                return res.status(404).send({ error: "Collaborator not found" });
+            } else {
+                const result = await db.collection('notes').updateOne(
+                    {_id: objectId},
+                    { $pull: { collaborators: { userId: userId, email: collaborator.email}}}
                 )
             }
 

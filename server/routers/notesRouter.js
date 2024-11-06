@@ -77,7 +77,6 @@ router.post('/notes', async (req, res) => {
     if (req.session.user) {
         try {
             const userId = req.session.user.id;
-            console.log(objectId)
             const db = await connect();
             const result = await db.collection("notes").insertOne({
                 ownerId: userId,
@@ -90,6 +89,27 @@ router.post('/notes', async (req, res) => {
             });
         } catch (error) {
             res.status(500).send({ message: "Error creating note" });
+        }
+    } else {
+        res.status(401).send({ message: "Unauthorized: User must be logged in."});
+    }
+})
+
+router.delete('/notes', async (req, res) => {
+    if (req.session.user) {
+        try {
+            const { noteId } = req.body;
+            const objectId = new ObjectId(noteId)
+            const db = await connect();
+            const result = await db.collection("notes").deleteOne({ _id: objectId});
+
+            if (result.deletedCount === 1) {
+                res.status(200).send({ message: "Note deleted successfully" });
+            } else {
+                res.status(404).send({ message: "Note not found" });
+            }
+        } catch (error) {
+            res.status(500).send({ message: "Error deleting note" });
         }
     } else {
         res.status(401).send({ message: "Unauthorized: User must be logged in."});

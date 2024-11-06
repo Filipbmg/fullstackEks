@@ -111,7 +111,7 @@
     async function removeCollaborator(email) {
         console.log("Removing collaborator with email:", email, "for noteId:", noteId);
         try {
-            const response = await fetch(`http://localhost:8080/collaborators`, {
+            const response = await fetch(`http://localhost:8080/collaborators/remove`, {
                 method: "DELETE",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -134,33 +134,37 @@
         <h2>
             NotePal
         </h2>
-        <button class="nav-button" on:click={() => navigate("/Home")}>Home</button>
-        <div class="dropdown">
-            <button class="nav-button" 
-            on:click={() => showCollaboratorsMenu = !showCollaboratorsMenu}
-            aria-haspopup="true"
-            aria-expanded={showCollaboratorsMenu}
-            >Manage Collaborators</button>
-            {#if showCollaboratorsMenu}
-                <div class="dropdown-menu">
-                    <h3>Collaborators</h3>
-                        <ul>
-                            {#each collaboratorList as collaborator}
-                                <li>{collaborator.email}</li>
-                                <button on:click={() => removeCollaborator(collaborator.email)}>Remove</button>
-                            {/each}
-                        </ul>
-                        <input
-                            type="email"
-                            bind:value={collaboratorEmail}
-                            placeholder="Add collaborator email"
-                        />
-                        <button on:click={addNewCollaborator}>Add Collaborator</button>
-                </div>
-            {/if}
+        <div class="left-buttons">
+            <button class="nav-button" on:click={() => navigate("/Home")}>Home</button>
+            <div class="dropdown">
+                <button class="nav-button" 
+                on:click={() => showCollaboratorsMenu = !showCollaboratorsMenu}
+                aria-haspopup="true"
+                aria-expanded={showCollaboratorsMenu}
+                >Manage Collaborators</button>
+                {#if showCollaboratorsMenu}
+                    <div class="dropdown-menu">
+                        <h3>Collaborators</h3>
+                            <ul>
+                                {#each collaboratorList as collaborator}
+                                    <li>{collaborator.email}</li>
+                                    <button on:click={() => removeCollaborator(collaborator.email)}>Remove</button>
+                                {/each}
+                            </ul>
+                            <input
+                                type="email"
+                                bind:value={collaboratorEmail}
+                                placeholder="Add collaborator email"
+                            />
+                            <button on:click={addNewCollaborator}>Add Collaborator</button>
+                    </div>
+                {/if}
+            </div>
         </div>
 
-        <button class="logout-button" on:click={logOut}>Log Out</button>
+        <div class="right-buttons">
+            <button class="logout-button" on:click={logOut}>Log Out</button>
+        </div>
     </nav>
     <div class="paper">
         <input
@@ -182,21 +186,49 @@
 </main>
 
 <style>
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background-color: lightgrey;
-      border-bottom: 2px solid black;
-      padding: 10px;
-      z-index: 1000;
+    :global(body) {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        font-family: 'Arial', sans-serif;
     }
-    
+
+    :global(main) {
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+        box-sizing: border-box;
+        display: flex;
+    }
+
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: lightgrey;
+        border-bottom: 2px solid black;
+        padding: 10px;
+        z-index: 1000;
+    }
+
+/* Container for left-aligned buttons */
+    .left-buttons {
+        display: flex;
+        align-items: center;
+    }
+
+/* Space out the nav buttons */
     .nav-button {
         padding: 8px;
         margin-right: 10px;
     }
+
     
     /* Dropdown container styling */
     .dropdown {
@@ -246,26 +278,9 @@
         cursor: pointer;
     }
 
-
-    :global(body) {
-        margin: 0;
-        padding: 0;
-        background-color: #f0f0f0;
-        font-family: 'Arial', sans-serif;
-    }
-
-    :global(main) {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 2rem;
-        box-sizing: border-box;
-    }
-
-    :global(.paper) {
-        width: 90%;
-        max-width: 1400px; /* Increased even further */
+    .paper {
+        width: 100%;
+        max-width: 700px; /* Increased even further */
         height: 90vh;
         background: white;
         border-radius: 8px;
@@ -273,10 +288,10 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        position: relative;
+        position: fixed;
     }
 
-    :global(.paper::before) {
+    .paper::before {
         content: '';
         position: absolute;
         top: 0;
@@ -286,8 +301,8 @@
         background: rgba(255, 0, 0, 0.1);
     }
 
-    :global(.title),
-    :global(.content) {
+    .title,
+    .content {
         border: none;
         outline: none;
         padding: 20px 60px;
@@ -295,21 +310,30 @@
         box-sizing: border-box;
     }
 
-    :global(.title) {
+    .title {
         font-size: 24px;
         font-weight: bold;
         border-bottom: 1px solid #eee;
     }
 
-    :global(.content) {
+    .content {
         flex-grow: 1;
         font-size: 16px;
         line-height: 1.6;
         resize: none;
     }
 
-    :global(.title::placeholder),
-    :global(.content::placeholder) {
+    .title::placeholder,
+    .content::placeholder {
         color: #aaa;
+    }
+
+    .logout-button {
+        background-color: red;
+        color: white;
+    }
+
+    .logout-button:hover {
+      background-color: darkred;
     }
 </style>

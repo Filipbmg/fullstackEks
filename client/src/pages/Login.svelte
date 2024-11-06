@@ -138,14 +138,17 @@
 
 <style>
     .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background-color: lightgrey;
-      border-bottom: 2px solid black;
-      padding: 10px;
-      z-index: 1000;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: lightgrey;
+        border-bottom: 2px solid black;
+        padding: 10px;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .container {
