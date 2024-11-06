@@ -56,6 +56,9 @@ app.use(usersRouter);
 import notesRouter from './routers/notesRouter.js';
 app.use(notesRouter);
 
+import collaboratorRouter from './routers/collaboratorRouter.js';
+app.use(collaboratorRouter);
+
 app.all("*", (req, res) => {
     res.status(404).send({ message: "Route not found" });
 });

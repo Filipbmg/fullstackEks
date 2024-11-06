@@ -10,7 +10,7 @@
     let userId = $user.user._id;
     let noteId;
     let socket;
-    let collaboratorEmail;
+    let collaboratorEmail = "";
     let collaboratorList = [];
     let note = { title: "", content: "" };
     let showCollaboratorsMenu = false;
@@ -100,18 +100,31 @@
                 throw new Error("Failed to add collaborator");
             }
 
-            const updatedNoteResponse = await fetch(`http://localhost:8080/notes/${noteId}`, {
-                method: "GET",
-                credentials: "include"
-            });
+            collaboratorList = [...collaboratorList, { email: collaboratorEmail }];
+            collaboratorEmail = "";
 
-            if (updatedNoteResponse.ok) {
-                const updatedNote = await updatedNoteResponse.json();
-                collaboratorList = updatedNote.collaborators || [];
-                collaboratorEmail = ""; // Clear the input field
-            }
         } catch (error) {
             throw new Error("Failed to add collaborator: " + error.message);
+        }
+    }
+
+    async function removeCollaborator(email) {
+        console.log("Removing collaborator with email:", email, "for noteId:", noteId);
+        try {
+            const response = await fetch(`http://localhost:8080/collaborators`, {
+                method: "DELETE",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ noteId: noteId, email: email })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to remove collaborator");
+            }
+
+            collaboratorList = collaboratorList.filter(collaborator => collaborator.email !== email);
+        } catch (error) {
+            throw new Error("Failed to remove collaborator: " + error.message);
         }
     }
 </script>
@@ -134,6 +147,7 @@
                         <ul>
                             {#each collaboratorList as collaborator}
                                 <li>{collaborator.email}</li>
+                                <button on:click={() => removeCollaborator(collaborator.email)}>Remove</button>
                             {/each}
                         </ul>
                         <input

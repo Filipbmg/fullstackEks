@@ -76,11 +76,11 @@ router.put('/notes/:id', async (req, res) => {
 router.post('/notes', async (req, res) => {
     if (req.session.user) {
         try {
-            const objectId = new ObjectId(req.session.user.id);
+            const userId = req.session.user.id;
             console.log(objectId)
             const db = await connect();
             const result = await db.collection("notes").insertOne({
-                ownerId: objectId,
+                ownerId: userId,
                 title: "New note"
             });
             
