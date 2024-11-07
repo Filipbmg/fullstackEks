@@ -62,15 +62,15 @@ router.delete('/collaborators/self', async (req, res) => {
             const { noteId } = req.body;
             const objectId = new ObjectId(noteId);
             const db = await connect();
-            const userId = req.session.user.id;
-            const collaborator = await db.collection('users').findOne({ userId })
+            const userId = new ObjectId(req.session.user.id);
+            const collaborator = await db.collection('users').findOne({ _id: userId })
 
             if (!collaborator) {
                 return res.status(404).send({ error: "Collaborator not found" });
             } else {
                 const result = await db.collection('notes').updateOne(
                     {_id: objectId},
-                    { $pull: { collaborators: { userId: userId, email: collaborator.email}}}
+                    { $pull: { collaborators: { userId: userId.toString(), email: collaborator.email}}}
                 )
             }
 

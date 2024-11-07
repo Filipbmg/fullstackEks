@@ -12,7 +12,7 @@
     let socket;
     let collaboratorEmail = "";
     let collaboratorList = [];
-    let note = { title: "", content: "" };
+    let note = { title: "", content: "", ownerId: "" };
     let showCollaboratorsMenu = false;
     let lastSavedVersion = {}
 
@@ -110,7 +110,7 @@
 
     async function removeCollaborator(email) {
         try {
-            const response = await fetch(`http://localhost:8080/collaborators/remove`, {
+            const response = await fetch(`http://localhost:8080/collaborators/`, {
                 method: "DELETE",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -135,34 +135,36 @@
         </h2>
         <div class="left-buttons">
             <button class="nav-button" on:click={() => navigate("/Home")}>Home</button>
-            <div class="dropdown">
-                <button class="nav-button" 
-                on:click={() => showCollaboratorsMenu = !showCollaboratorsMenu}
-                aria-haspopup="true"
-                aria-expanded={showCollaboratorsMenu}
-                >Manage Collaborators</button>
-                {#if showCollaboratorsMenu}
-                    <div class="dropdown-menu">
-                        <h3>Collaborators</h3>
-                            <ul class="collaborator-list">
-                                {#each collaboratorList as collaborator}
-                                    <li class="collaborator-item">
-                                        <span>
-                                            {collaborator.email}
-                                        </span>
-                                        <button class="remove-button" on:click={() => removeCollaborator(collaborator.email)}>✖</button>
-                                    </li>
-                                {/each}
-                            </ul>
-                            <input
-                                type="email"
-                                bind:value={collaboratorEmail}
-                                placeholder="Add collaborator email"
-                            />
-                            <button class="collaborator-button" on:click={addNewCollaborator}>Add Collaborator</button>
-                    </div>
-                {/if}
-            </div>
+            {#if note.ownerId === userId}
+                <div class="dropdown">
+                    <button class="nav-button" 
+                    on:click={() => showCollaboratorsMenu = !showCollaboratorsMenu}
+                    aria-haspopup="true"
+                    aria-expanded={showCollaboratorsMenu}
+                    >Manage Collaborators</button>
+                    {#if showCollaboratorsMenu}
+                        <div class="dropdown-menu">
+                            <h3>Collaborators</h3>
+                                <ul class="collaborator-list">
+                                    {#each collaboratorList as collaborator}
+                                        <li class="collaborator-item">
+                                            <span>
+                                                {collaborator.email}
+                                            </span>
+                                            <button class="remove-button" on:click={() => removeCollaborator(collaborator.email)}>✖</button>
+                                        </li>
+                                    {/each}
+                                </ul>
+                                <input
+                                    type="email"
+                                    bind:value={collaboratorEmail}
+                                    placeholder="Add collaborator email"
+                                />
+                                <button class="collaborator-button" on:click={addNewCollaborator}>Add Collaborator</button>
+                        </div>
+                    {/if}
+                </div>
+            {/if}    
         </div>
 
         <div class="right-buttons">
